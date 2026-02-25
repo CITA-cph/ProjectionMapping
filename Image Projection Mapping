@@ -1,0 +1,63 @@
+"""
+Shahriar Akbari 25.02.2026 
+
+Image projection using Zivid internal projector.
+
+"""
+
+from typing import Tuple
+import numpy as np
+import zivid
+from PIL import Image 
+
+
+def load_projector_image(file_path: str, resolution: Tuple[int, int]) -> np.ndarray:
+    """Load an image from a file and resize it to the projector resolution.
+
+    Args:
+        file_path: Path to the image file.
+        resolution: Projector resolution as a tuple (width, height).
+
+    Returns:
+        An image (numpy array) formatted for the projector (BGRA format).
+    """
+    
+    img = Image.open(file_path).convert("RGBA")
+    img = img.resize((resolution[1], resolution[0]))  
+    projector_image = np.array(img)
+    return projector_image
+
+
+def _main() -> None:
+    with zivid.Application() as app:
+        print("Connecting to camera")
+        with app.connect_camera() as camera:
+            print("Retrieving the projector resolution that the camera supports")
+            projector_resolution = (720, 1280)  
+
+            image_path = r"C:\Users\sakb\height_map_frame_0007.png"  # ------------> Change this to your desired image file path
+            projector_image = load_projector_image(image_path, projector_resolution)
+
+            # Start projecting the image 
+            project_image_handle = zivid.projection.show_image_bgra(camera, projector_image)
+
+            input('Press enter to stop projecting using the ".stop()" function')
+            project_image_handle.stop()
+
+            projector_image = load_projector_image(image_path, projector_resolution)
+            with zivid.projection.show_image_bgra(camera, projector_image):
+                input("Press enter to stop projecting with context manager")
+
+            projector_image = load_projector_image(image_path, projector_resolution)
+            project_image_handle = zivid.projection.show_image_bgra(camera, projector_image)
+
+            input("Press enter to stop projecting by performing a 3D capture")
+            settings = zivid.Settings()
+            settings.acquisitions.append(zivid.Settings.Acquisition())
+            camera.capture(settings)
+
+            input("Press enter to exit")
+
+
+if __name__ == "__main__":
+    _main()
