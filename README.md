@@ -8,4 +8,4 @@ Optochromogenesis: a projection-mapping framework for spatiotemporal control of 
 Repository includes: 
 - Image projection mapping
 - Automatic depth map projection mapping
-- Day/Night cycle for projector running on windows. 
+- Day/Night cycle for projectors running on windows. 
